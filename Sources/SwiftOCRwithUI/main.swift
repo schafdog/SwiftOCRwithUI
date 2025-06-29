@@ -1,25 +1,46 @@
 import AppKit
-// main.swift
 import Foundation
 import Vision
 
-// MARK: - Region Selector View
+// MARK:  Region Selector View
 class RegionSelectorView: NSView {
     var image: NSImage
+    var scaledImage: NSImage
+    var scale: CGFloat
     var selection: NSRect?
     var startPoint: NSPoint?
     var completion: ((CGRect) -> Void)?
 
-    init(image: NSImage, completion: @escaping (CGRect) -> Void) {
+    init(
+        image: NSImage, scaleToFit maxSize: CGSize, allowScaling: Bool = true,
+        completion: @escaping (CGRect) -> Void
+    ) {
         self.image = image
+
+        if allowScaling {
+            let widthRatio = maxSize.width / image.size.width
+            let heightRatio = maxSize.height / image.size.height
+            self.scale = 0.9 * min(1.0, min(widthRatio, heightRatio))
+        } else {
+            self.scale = 1.0
+        }
+
+        let newSize = NSSize(width: image.size.width * scale, height: image.size.height * scale)
+        self.scaledImage = NSImage(size: newSize)
+        self.scaledImage.lockFocus()
+        image.draw(
+            in: NSRect(origin: .zero, size: newSize), from: .zero, operation: .sourceOver,
+            fraction: 1.0)
+        self.scaledImage.unlockFocus()
+
+        super.init(frame: NSRect(origin: .zero, size: newSize))
         self.completion = completion
-        super.init(frame: NSRect(origin: .zero, size: image.size))
     }
 
     required init?(coder: NSCoder) { fatalError() }
 
     override func draw(_ dirtyRect: NSRect) {
-        image.draw(in: bounds)
+        scaledImage.draw(in: bounds)
         if let selection = selection {
             NSColor.red.setStroke()
             NSBezierPath(rect: selection).stroke()
@@ -43,7 +64,13 @@ class RegionSelectorView: NSView {
 
     override func mouseUp(with event: NSEvent) {
         guard let selection = selection else { return }
-        completion?(selection)
+        let unscaled = NSRect(
+            x: selection.origin.x / scale,
+            y: selection.origin.y / scale,
+            width: selection.size.width / scale,
+            height: selection.size.height / scale)
+        print("Selection \(selection) / \(scale) = $\(unscaled)")
+        completion?(unscaled)
     }
 }
 
@@ -73,6 +100,7 @@ func loadImage(from path: String) -> NSImage? {
     return NSImage(contentsOf: url)
 }
 
+// MARK: - Helper Functions
 func cgImage(from nsImage: NSImage) -> CGImage? {
     guard let tiffData = nsImage.tiffRepresentation,
         let bitmap = NSBitmapImageRep(data: tiffData)
@@ -80,7 +108,6 @@ func cgImage(from nsImage: NSImage) -> CGImage? {
     return bitmap.cgImage
 }
 
-// MARK: - OCR
 func performOCR(
     on cgImage: CGImage, region: CGRect?, imageSize: CGSize, outputURL: URL,
     completion: @escaping (String) -> Void
@@ -89,7 +116,6 @@ func performOCR(
         if let error = error {
             print("OCR error: \(error.localizedDescription)")
             completion("")
-            return
         }
 
         let results = (request.results as? [VNRecognizedTextObservation]) ?? []
@@ -110,6 +136,7 @@ func performOCR(
     request.minimumTextHeight = 0.01
 
     var handler: VNImageRequestHandler
+
     if let region = region {
         let normalized = CGRect(
             x: region.minX / imageSize.width,
@@ -118,6 +145,7 @@ func performOCR(
             height: region.height / imageSize.height)
         request.regionOfInterest = normalized
     }
+
     handler = VNImageRequestHandler(cgImage: cgImage, orientation: .up, options: [:])
 
     do {
@@ -131,31 +159,32 @@ func performOCR(
 // MARK: - Entry Point
 let args = CommandLine.arguments
 
-guard args.count == 2 else {
-    print("Usage: SwiftOCR <image_path>")
+if args.count < 2 {
+    print("Usage: SwiftOCR <image_path> [--noscale]")
     exit(1)
 }
 
-let imagePath = args[1]
-let inputURL = URL(fileURLWithPath: imagePath)
-let regionOutputURL = inputURL.deletingPathExtension().appendingPathExtension("region.txt")
-let outputURL = inputURL.deletingPathExtension().appendingPathExtension("txt")
-guard let nsImage = loadImage(from: imagePath),
-    let cgImage = cgImage(from: nsImage)
-else {
-    print("❌ Failed to load image from \(imagePath)")
+let path = args[1]
+let noscale = args.contains("--noscale")
+
+let url = URL(fileURLWithPath: path)
+let basename = url.deletingPathExtension()
+let regionOutputURL = basename.appendingPathExtension("region.txt")
+let outputURL = basename.appendingPathExtension("txt")
+let croppedImageURL = basename.appendingPathExtension("cropped.jpg")
+
+guard let image = NSImage(contentsOf: url), let cg = cgImage(from: image) else {
+    print("Failed to load image")
     exit(1)
 }
 
 DispatchQueue.main.async {
-    let window = NSWindow(
-        contentRect: NSRect(origin: .zero, size: nsImage.size),
-        styleMask: [.titled, .closable],
-        backing: .buffered, defer: false)
-    window.title = "Select Region"
-    window.makeKeyAndOrderFront(nil)
+    let screenSize = NSScreen.main?.visibleFrame.size ?? NSSize(width: 800, height: 600)
+    let selectorView = RegionSelectorView(
+        image: image, scaleToFit: screenSize, allowScaling: !noscale
+    ) {
+        selectedRect in
 
-    let selectorView = RegionSelectorView(image: nsImage) { selectedRect in
         // Save region to file
         let regionString = String(
             format: "%.2f %.2f %.2f %.2f",
@@ -171,25 +200,30 @@ DispatchQueue.main.async {
             print("❌ Failed to save region: \(error.localizedDescription)")
         }
 
-        // Save cropped region as JPEG for visual verification
-        let croppedImageURL = inputURL.deletingPathExtension().appendingPathExtension("cropped.jpg")
         // Flip coordinates
         let flippedRect = NSRect(
             x: selectedRect.origin.x,
-            y: nsImage.size.height - selectedRect.origin.y - selectedRect.height,
+            y: image.size.height - selectedRect.origin.y - selectedRect.height,
             width: selectedRect.width,
             height: selectedRect.height
         )
-
-        saveRegionAsJPEG(from: cgImage, region: flippedRect, to: croppedImageURL)
-        performOCR(on: cgImage, region: selectedRect, imageSize: nsImage.size, outputURL: outputURL)
-        { text in
+        print("📍 Selected Rect: \(selectedRect)")
+        print("↕️ Flipped Rect: \(flippedRect)")
+        saveRegionAsJPEG(from: cg, region: flippedRect, to: croppedImageURL)
+        performOCR(on: cg, region: selectedRect, imageSize: image.size, outputURL: outputURL) {
+            text in
             print("\n🔍 OCR Result:\n\(text)")
             NSApp.terminate(nil)
         }
     }
 
+    let window = NSWindow(
+        contentRect: selectorView.frame,
+        styleMask: [.titled, .closable],
+        backing: .buffered, defer: false)
+    window.title = "Select Region"
     window.contentView = selectorView
+    window.makeKeyAndOrderFront(nil)
 }
 
 let app = NSApplication.shared
