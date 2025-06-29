@@ -1,0 +1,248 @@
+{
+  "builtTestProducts" : [
+
+  ],
+  "copyCommands" : {
+
+  },
+  "explicitTargetDependencyImportCheckingMode" : {
+    "none" : {
+
+    }
+  },
+  "generatedSourceTargetSet" : [
+
+  ],
+  "pluginDescriptions" : [
+
+  ],
+  "swiftCommands" : {
+    "C.SwiftOCRwithUI-arm64-apple-macosx15.0-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/dennis/Projects/SwiftOCRwithUI/.build/arm64-apple-macosx/debug/SwiftOCRwithUI.build/sources",
+      "importPath" : "/Users/dennis/Projects/SwiftOCRwithUI/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/dennis/Projects/SwiftOCRwithUI/Sources/SwiftOCRwithUI/main.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/dennis/Projects/SwiftOCRwithUI/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/dennis/Projects/SwiftOCRwithUI/.build/arm64-apple-macosx/debug/SwiftOCRwithUI.build/sources"
+        }
+      ],
+      "isLibrary" : false,
+      "moduleName" : "SwiftOCRwithUI",
+      "moduleOutputPath" : "/Users/dennis/Projects/SwiftOCRwithUI/.build/arm64-apple-macosx/debug/Modules/SwiftOCRwithUI.swiftmodule",
+      "objects" : [
+        "/Users/dennis/Projects/SwiftOCRwithUI/.build/arm64-apple-macosx/debug/SwiftOCRwithUI.build/main.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx12.0",
+        "-enable-batch-mode",
+        "-index-store-path",
+        "/Users/dennis/Projects/SwiftOCRwithUI/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-j8",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-module-cache-path",
+        "/Users/dennis/Projects/SwiftOCRwithUI/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-Xfrontend",
+        "-entry-point-function-name",
+        "-Xfrontend",
+        "SwiftOCRwithUI_main",
+        "-color-diagnostics",
+        "-swift-version",
+        "5",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g"
+      ],
+      "outputFileMapPath" : "/Users/dennis/Projects/SwiftOCRwithUI/.build/arm64-apple-macosx/debug/SwiftOCRwithUI.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/dennis/Projects/SwiftOCRwithUI/.build/arm64-apple-macosx/debug/SwiftOCRwithUI.build/main.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/dennis/Projects/SwiftOCRwithUI/.build/arm64-apple-macosx/debug/Modules/SwiftOCRwithUI.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/dennis/Projects/SwiftOCRwithUI/Sources/SwiftOCRwithUI/main.swift"
+      ],
+      "tempsPath" : "/Users/dennis/Projects/SwiftOCRwithUI/.build/arm64-apple-macosx/debug/SwiftOCRwithUI.build",
+      "wholeModuleOptimization" : false
+    }
+  },
+  "swiftFrontendCommands" : {
+
+  },
+  "swiftTargetScanArgs" : {
+    "SwiftOCRwithUI" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "SwiftOCRwithUI",
+      "-incremental",
+      "-c",
+      "/Users/dennis/Projects/SwiftOCRwithUI/Sources/SwiftOCRwithUI/main.swift",
+      "-I",
+      "/Users/dennis/Projects/SwiftOCRwithUI/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx12.0",
+      "-enable-batch-mode",
+      "-index-store-path",
+      "/Users/dennis/Projects/SwiftOCRwithUI/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-j8",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-module-cache-path",
+      "/Users/dennis/Projects/SwiftOCRwithUI/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-Xfrontend",
+      "-entry-point-function-name",
+      "-Xfrontend",
+      "SwiftOCRwithUI_main",
+      "-color-diagnostics",
+      "-swift-version",
+      "5",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ]
+  },
+  "targetDependencyMap" : {
+    "SwiftOCRwithUI" : [
+
+    ]
+  },
+  "testDiscoveryCommands" : {
+
+  },
+  "testEntryPointCommands" : {
+
+  },
+  "traitConfiguration" : {
+    "enableAllTraits" : false
+  },
+  "writeCommands" : {
+    "/Users/dennis/Projects/SwiftOCRwithUI/.build/arm64-apple-macosx/debug/SwiftOCRwithUI-entitlement.plist" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<entitlement-plist>"
+        },
+        {
+          "kind" : "virtual",
+          "name" : "<com.apple.security.get-task-allow>"
+        }
+      ],
+      "outputFilePath" : "/Users/dennis/Projects/SwiftOCRwithUI/.build/arm64-apple-macosx/debug/SwiftOCRwithUI-entitlement.plist"
+    },
+    "/Users/dennis/Projects/SwiftOCRwithUI/.build/arm64-apple-macosx/debug/SwiftOCRwithUI.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/dennis/Projects/SwiftOCRwithUI/Sources/SwiftOCRwithUI/main.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/dennis/Projects/SwiftOCRwithUI/.build/arm64-apple-macosx/debug/SwiftOCRwithUI.build/sources"
+    },
+    "/Users/dennis/Projects/SwiftOCRwithUI/.build/arm64-apple-macosx/debug/SwiftOCRwithUI.product/Objects.LinkFileList" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<link-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/dennis/Projects/SwiftOCRwithUI/.build/arm64-apple-macosx/debug/SwiftOCRwithUI.build/main.swift.o"
+        }
+      ],
+      "outputFilePath" : "/Users/dennis/Projects/SwiftOCRwithUI/.build/arm64-apple-macosx/debug/SwiftOCRwithUI.product/Objects.LinkFileList"
+    },
+    "/Users/dennis/Projects/SwiftOCRwithUI/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt" : {
+      "alwaysOutOfDate" : true,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<swift-get-version>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+        }
+      ],
+      "outputFilePath" : "/Users/dennis/Projects/SwiftOCRwithUI/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+    }
+  }
+}

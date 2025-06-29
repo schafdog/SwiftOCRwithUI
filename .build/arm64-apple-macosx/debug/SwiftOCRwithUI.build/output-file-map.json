@@ -1,0 +1,11 @@
+{
+  "": {
+    "swift-dependencies": "/Users/dennis/Projects/SwiftOCRwithUI/.build/arm64-apple-macosx/debug/SwiftOCRwithUI.build/master.swiftdeps"
+  },
+  "/Users/dennis/Projects/SwiftOCRwithUI/Sources/SwiftOCRwithUI/main.swift": {
+    "dependencies": "/Users/dennis/Projects/SwiftOCRwithUI/.build/arm64-apple-macosx/debug/SwiftOCRwithUI.build/main.d",
+    "object": "/Users/dennis/Projects/SwiftOCRwithUI/.build/arm64-apple-macosx/debug/SwiftOCRwithUI.build/main.swift.o",
+    "swiftmodule": "/Users/dennis/Projects/SwiftOCRwithUI/.build/arm64-apple-macosx/debug/SwiftOCRwithUI.build/main~partial.swiftmodule",
+    "swift-dependencies": "/Users/dennis/Projects/SwiftOCRwithUI/.build/arm64-apple-macosx/debug/SwiftOCRwithUI.build/main.swiftdeps"
+  }
+}
