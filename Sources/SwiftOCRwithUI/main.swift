@@ -46,6 +46,26 @@ class RegionSelectorView: NSView {
     }
 }
 
+func saveRegionAsJPEG(from cgImage: CGImage, region: CGRect, to url: URL) {
+    guard let cropped = cgImage.cropping(to: region) else {
+        print("❌ Failed to crop region for JPEG")
+        return
+    }
+    
+    let bitmapRep = NSBitmapImageRep(cgImage: cropped)
+    guard let jpegData = bitmapRep.representation(using: .jpeg, properties: [:]) else {
+        print("❌ Failed to create JPEG data")
+        return
+    }
+    
+    do {
+        try jpegData.write(to: url)
+        print("🖼 Saved cropped region as JPEG to \(url.path)")
+    } catch {
+        print("❌ Failed to write JPEG: \(error.localizedDescription)")
+    }
+}
+
 // MARK: - Load CGImage
 func loadImage(from path: String) -> NSImage? {
     let url = URL(fileURLWithPath: path)
@@ -127,8 +147,27 @@ DispatchQueue.main.async {
     window.title = "Select Region"
     window.makeKeyAndOrderFront(nil)
 
+
     let selectorView = RegionSelectorView(image: nsImage) { selectedRect in
-        performOCR(on: cgImage, region: selectedRect, imageSize: nsImage.size, outputURL: outputURL) { text in
+        // Save region to file
+        let regionString = String(format: "%.2f %.2f %.2f %.2f",
+                                  selectedRect.origin.x,
+                                  selectedRect.origin.y,
+                                  selectedRect.size.width,
+                                  selectedRect.size.height)
+        do {
+//            try regionString.write(to: regionOutputURL, atomically: true, encoding: .utf8)
+            print("Region selected \(regionString)");
+//            print("📐 Saved region to \(regionOutputURL.path)")
+        } catch {
+            print("❌ Failed to save region: \(error.localizedDescription)")
+        }
+ 
+
+       // Save cropped region as JPEG for visual verification
+       let croppedImageURL = inputURL.deletingPathExtension().appendingPathExtension("cropped.jpg")
+       saveRegionAsJPEG(from: cgImage, region: selectedRect, to: croppedImageURL)
+    	performOCR(on: cgImage, region: selectedRect, imageSize: nsImage.size, outputURL: outputURL) { text in
             print("\n🔍 OCR Result:\n\(text)")
             NSApp.terminate(nil)
         }
