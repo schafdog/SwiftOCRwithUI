@@ -1,7 +1,7 @@
+import AppKit
 // main.swift
 import Foundation
 import Vision
-import AppKit
 
 // MARK: - Region Selector View
 class RegionSelectorView: NSView {
@@ -33,10 +33,11 @@ class RegionSelectorView: NSView {
     override func mouseDragged(with event: NSEvent) {
         guard let start = startPoint else { return }
         let current = convert(event.locationInWindow, from: nil)
-        selection = NSRect(x: min(start.x, current.x),
-                           y: min(start.y, current.y),
-                           width: abs(current.x - start.x),
-                           height: abs(current.y - start.y))
+        selection = NSRect(
+            x: min(start.x, current.x),
+            y: min(start.y, current.y),
+            width: abs(current.x - start.x),
+            height: abs(current.y - start.y))
         needsDisplay = true
     }
 
@@ -51,13 +52,13 @@ func saveRegionAsJPEG(from cgImage: CGImage, region: CGRect, to url: URL) {
         print("❌ Failed to crop region for JPEG")
         return
     }
-    
+
     let bitmapRep = NSBitmapImageRep(cgImage: cropped)
     guard let jpegData = bitmapRep.representation(using: .jpeg, properties: [:]) else {
         print("❌ Failed to create JPEG data")
         return
     }
-    
+
     do {
         try jpegData.write(to: url)
         print("🖼 Saved cropped region as JPEG to \(url.path)")
@@ -74,12 +75,16 @@ func loadImage(from path: String) -> NSImage? {
 
 func cgImage(from nsImage: NSImage) -> CGImage? {
     guard let tiffData = nsImage.tiffRepresentation,
-          let bitmap = NSBitmapImageRep(data: tiffData) else { return nil }
+        let bitmap = NSBitmapImageRep(data: tiffData)
+    else { return nil }
     return bitmap.cgImage
 }
 
 // MARK: - OCR
-func performOCR(on cgImage: CGImage, region: CGRect?, imageSize: CGSize, outputURL: URL, completion: @escaping (String) -> Void) {
+func performOCR(
+    on cgImage: CGImage, region: CGRect?, imageSize: CGSize, outputURL: URL,
+    completion: @escaping (String) -> Void
+) {
     let request = VNRecognizeTextRequest { request, error in
         if let error = error {
             print("OCR error: \(error.localizedDescription)")
@@ -106,11 +111,12 @@ func performOCR(on cgImage: CGImage, region: CGRect?, imageSize: CGSize, outputU
 
     var handler: VNImageRequestHandler
     if let region = region {
-        let normalized = CGRect(x: region.minX / imageSize.width,
-                                y: region.minY / imageSize.height,
-                                width: region.width / imageSize.width,
-                                height: region.height / imageSize.height)
-	request.regionOfInterest = normalized
+        let normalized = CGRect(
+            x: region.minX / imageSize.width,
+            y: region.minY / imageSize.height,
+            width: region.width / imageSize.width,
+            height: region.height / imageSize.height)
+        request.regionOfInterest = normalized
     }
     handler = VNImageRequestHandler(cgImage: cgImage, orientation: .up, options: [:])
 
@@ -135,39 +141,49 @@ let inputURL = URL(fileURLWithPath: imagePath)
 let outputURL = inputURL.deletingPathExtension().appendingPathExtension("txt")
 
 guard let nsImage = loadImage(from: imagePath),
-      let cgImage = cgImage(from: nsImage) else {
+    let cgImage = cgImage(from: nsImage)
+else {
     print("❌ Failed to load image from \(imagePath)")
     exit(1)
 }
 
 DispatchQueue.main.async {
-    let window = NSWindow(contentRect: NSRect(origin: .zero, size: nsImage.size),
-                          styleMask: [.titled, .closable],
-                          backing: .buffered, defer: false)
+    let window = NSWindow(
+        contentRect: NSRect(origin: .zero, size: nsImage.size),
+        styleMask: [.titled, .closable],
+        backing: .buffered, defer: false)
     window.title = "Select Region"
     window.makeKeyAndOrderFront(nil)
 
-
     let selectorView = RegionSelectorView(image: nsImage) { selectedRect in
         // Save region to file
-        let regionString = String(format: "%.2f %.2f %.2f %.2f",
-                                  selectedRect.origin.x,
-                                  selectedRect.origin.y,
-                                  selectedRect.size.width,
-                                  selectedRect.size.height)
+        let regionString = String(
+            format: "%.2f %.2f %.2f %.2f",
+            selectedRect.origin.x,
+            selectedRect.origin.y,
+            selectedRect.size.width,
+            selectedRect.size.height)
         do {
-//            try regionString.write(to: regionOutputURL, atomically: true, encoding: .utf8)
-            print("Region selected \(regionString)");
-//            print("📐 Saved region to \(regionOutputURL.path)")
+            //            try regionString.write(to: regionOutputURL, atomically: true, encoding: .utf8)
+            print("Region selected \(regionString)")
+            //            print("📐 Saved region to \(regionOutputURL.path)")
         } catch {
             print("❌ Failed to save region: \(error.localizedDescription)")
         }
- 
 
-       // Save cropped region as JPEG for visual verification
-       let croppedImageURL = inputURL.deletingPathExtension().appendingPathExtension("cropped.jpg")
-       saveRegionAsJPEG(from: cgImage, region: selectedRect, to: croppedImageURL)
-    	performOCR(on: cgImage, region: selectedRect, imageSize: nsImage.size, outputURL: outputURL) { text in
+        // Save cropped region as JPEG for visual verification
+        let croppedImageURL = inputURL.deletingPathExtension().appendingPathExtension("cropped.jpg")
+        // Flip coordinates
+        let flippedRect = NSRect(
+            x: selectedRect.origin.x,
+            y: nsImage.size.height - selectedRect.origin.y - selectedRect.height,
+            width: selectedRect.width,
+            height: selectedRect.height
+        )
+
+        saveRegionAsJPEG(from: cgImage, region: flippedRect, to: croppedImageURL)
+        performOCR(on: cgImage, region: selectedRect, imageSize: nsImage.size, outputURL: outputURL)
+        { text in
             print("\n🔍 OCR Result:\n\(text)")
             NSApp.terminate(nil)
         }
