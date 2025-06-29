@@ -138,8 +138,8 @@ guard args.count == 2 else {
 
 let imagePath = args[1]
 let inputURL = URL(fileURLWithPath: imagePath)
+let regionOutputURL = inputURL.deletingPathExtension().appendingPathExtension("region.txt")
 let outputURL = inputURL.deletingPathExtension().appendingPathExtension("txt")
-
 guard let nsImage = loadImage(from: imagePath),
     let cgImage = cgImage(from: nsImage)
 else {
@@ -164,9 +164,9 @@ DispatchQueue.main.async {
             selectedRect.size.width,
             selectedRect.size.height)
         do {
-            //            try regionString.write(to: regionOutputURL, atomically: true, encoding: .utf8)
+            try regionString.write(to: regionOutputURL, atomically: true, encoding: .utf8)
             print("Region selected \(regionString)")
-            //            print("📐 Saved region to \(regionOutputURL.path)")
+            print("📐 Saved region to \(regionOutputURL.path)")
         } catch {
             print("❌ Failed to save region: \(error.localizedDescription)")
         }
