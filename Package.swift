@@ -8,12 +8,17 @@ let package = Package(
     ],
     products: [
         .executable(name: "SwiftOCRwithUI", targets: ["SwiftOCRwithUI"]),
+        .executable(name: "DateRenamer", targets: ["DateRenamer"]),
     ],
     dependencies: [],
     targets: [
         .executableTarget(
             name: "SwiftOCRwithUI",
             dependencies: []
-        )
+        ),
+        .executableTarget(
+            name: "DateRenamer",
+            dependencies: []
+        ),
     ]
 )
