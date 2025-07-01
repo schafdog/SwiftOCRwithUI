@@ -74,7 +74,7 @@ class RegionSelectorView: NSView, NSWindowDelegate {
     }
 
     func windowWillClose(_ notification: Notification) {
-        print("Window closing...")
+        // print("Window closing...")
         completion?(nil)  // signal cancellation
     }
 }
@@ -93,7 +93,7 @@ func saveRegionAsJPEG(from cgImage: CGImage, region: CGRect, to url: URL) {
 
     do {
         try jpegData.write(to: url)
-        print("🖼 Saved cropped region as JPEG to \(url.path)")
+        // print("🖼 Saved cropped region as JPEG to \(url.path)")
     } catch {
         print("❌ Failed to write JPEG: \(error.localizedDescription)")
     }
@@ -132,7 +132,7 @@ func performOCR(
                 return
             }
             try text.write(to: outputURL, atomically: true, encoding: .utf8)
-            print("✅ Saved OCR result to \(outputURL.path)")
+            // print("✅ Saved OCR result to \(outputURL.path)")
         } catch {
             print("❌ Failed to save output: \(error.localizedDescription)")
         }
@@ -140,7 +140,7 @@ func performOCR(
         completion(text)
     }
 
-    request.recognitionLevel = .accurate
+    request.recognitionLevel = .fast
     request.usesLanguageCorrection = true
     request.minimumTextHeight = 0.01
 
@@ -168,11 +168,11 @@ func performOCR(
 func saveRegion(image: NSImage, region: NSRect, to regionOutputURL: URL) {
     // Save region to file
     let regionString = String(
-        format: "%.2f %.2f %.2f %.2f",
-        region.origin.x,
-        region.origin.y,
-        region.size.width,
-        region.size.height)
+        format: "%.4f %.4f %.4f %.4f \n",
+        region.origin.x / image.size.width,
+        region.origin.y / image.size.height,
+        region.size.width / image.size.width,
+        region.size.height / image.size.height)
     do {
         try regionString.write(to: regionOutputURL, atomically: true, encoding: .utf8)
         print("Region selected \(regionString)")
@@ -202,15 +202,25 @@ func loadRegion(from regionFile: URL) -> NSRect? {
         print("❌ Failed to decode region string")
         return nil
     }
-    print("✅ Loaded region \(regionString) from \(regionFile.path)")
+    // print("✅ Loaded region string \(regionString) from \(regionFile.path)")
     let components = regionString.split(separator: " ")
-    guard components.count == 4 else { return nil }
+    // onents: \(components)")
+    guard components.count >= 4 else { return nil }
     guard let x = Double(components[0]), let y = Double(components[1]),
         let width = Double(components[2]), let height = Double(components[3])
     else { return nil }
     let region = NSRect(x: x, y: y, width: width, height: height)
-    print("✅ Loaded region \(region) from \(regionFile.path)")
+    // print("✅ Loaded region \(region) from \(regionFile.path)")
     return region
+}
+
+func scaleRegion(image: NSImage, region: NSRect) -> NSRect {
+    NSRect(
+        x: region.origin.x * image.size.width,
+        y: region.origin.y * image.size.height,
+        width: region.width * image.size.width,
+        height: region.height * image.size.height
+    )
 }
 
 func terminateApp(exitCode: Int32) {
@@ -254,15 +264,15 @@ guard let image = NSImage(contentsOf: url), let cg = cgImage(from: image) else {
 }
 
 if reuse {
-    if let region = loadRegion(from: regionFileURL) {
-        print("📍 Loaded Region: \(region)")
-        let jpegRect = flipRegion(image: image, region: region)
-        print("↕️ JPEG Region: \(jpegRect)")
+    if let normalized = loadRegion(from: regionFileURL) {
+        let jpegRect = scaleRegion(image: image, region: normalized)
+        // print("📍 Loaded JPEG Region: \(jpegRect)")
+        let region = flipRegion(image: image, region: jpegRect)
+        // print("↕️ Region: \(region)")
         saveRegionAsJPEG(from: cg, region: jpegRect, to: croppedImageURL)
         performOCR(on: cg, region: region, imageSize: image.size, outputURL: outputURL) {
             text in
-            print("\n🔍 OCR Result:\n\(text)")
-            print("✅ OCR complete with reused region. Files saved.")
+            print("🔍 OCR Result: \(text) for \(path)")
         }
         exit(0)
     } else {
@@ -279,14 +289,14 @@ DispatchQueue.main.async {
     ) {
         selectedRect in
         guard let selectedRect = selectedRect else {
-            print("❌ User cancelled selection")
+            // print("❌ User cancelled selection")
             terminateApp(exitCode: 1)
             return
         }
         let flippedRect = flipRegion(image: image, region: selectedRect)
-        print("📍 Selected Rect: \(selectedRect)")
-        print("↕️ Flipped Rect: \(flippedRect)")
-        saveRegion(image: image, region: selectedRect, to: regionOutputURL)
+        // print("📍 Selected Rect: \(selectedRect)")
+        // print("↕️ Flipped Rect: \(flippedRect)")
+        saveRegion(image: image, region: flippedRect, to: regionOutputURL)
         saveRegionAsJPEG(from: cg, region: flippedRect, to: croppedImageURL)
         performOCR(on: cg, region: selectedRect, imageSize: image.size, outputURL: outputURL) {
             text in
@@ -304,7 +314,6 @@ DispatchQueue.main.async {
     window.delegate = selectorView
     window.makeKeyAndOrderFront(nil)
 }
-
 let app = NSApplication.shared
 app.setActivationPolicy(.regular)
 app.activate(ignoringOtherApps: true)
